@@ -1,0 +1,27 @@
+{
+  "name": "@bank/queue",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./testing": "./src/testing.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --check . --ignore-path ../../.gitignore --ignore-path ../../.prettierignore"
+  },
+  "dependencies": {
+    "bullmq": "catalog:",
+    "ioredis": "catalog:"
+  },
+  "devDependencies": {
+    "@bank/eslint-config": "workspace:*",
+    "@bank/tsconfig": "workspace:*",
+    "@testcontainers/redis": "catalog:",
+    "@types/node": "catalog:",
+    "eslint": "catalog:",
+    "typescript": "catalog:"
+  }
+}

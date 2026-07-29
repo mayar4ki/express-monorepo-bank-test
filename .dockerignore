@@ -1,0 +1,10 @@
+**/node_modules
+**/dist
+**/coverage
+**/.cache
+.git
+.husky
+.env
+**/.env
+*.log
+**/tests

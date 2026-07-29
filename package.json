@@ -1,0 +1,46 @@
+{
+  "name": "bank-monorepo",
+  "version": "1.0.0",
+  "description": "Internal banking platform: banking API, auth API and transfer executor.",
+  "license": "UNLICENSED",
+  "private": true,
+  "packageManager": "pnpm@11.17.0",
+  "type": "module",
+  "engines": {
+    "node": ">=24",
+    "pnpm": ">=11"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint --continue -- --cache --cache-location .cache/.eslintcache",
+    "lint:ws": "pnpm dlx sherif@latest",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "test:unit": "turbo run test:unit",
+    "test:integration": "turbo run test:integration",
+    "format": "turbo run format --continue -- --write --cache --cache-location .cache/.prettiercache",
+    "format:check": "turbo run format --continue -- --cache --cache-location .cache/.prettiercache",
+    "postinstall": "pnpm lint:ws",
+    "db:generate": "pnpm --filter @bank/db db:generate",
+    "db:migrate": "pnpm --filter @bank/db db:migrate",
+    "prepare": "husky"
+  },
+  "prettier": "@bank/prettier-config",
+  "lint-staged": {
+    "*.ts": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
+  },
+  "devDependencies": {
+    "@bank/prettier-config": "workspace:*",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.2.0",
+    "prettier": "catalog:",
+    "turbo": "^2.10.7"
+  }
+}

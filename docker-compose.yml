@@ -1,0 +1,143 @@
+# Runs the whole platform with zero prior setup:
+#
+#   docker compose up --build
+#
+# Then everything is on ONE port, behind the nginx gateway:
+#   - Gateway       http://localhost:3000  (combined Swagger UI at /docs)
+#   - Login:        POST :3000/auth/login  { "email": "admin@bank.local", "password": "admin12345" }
+#   - Banking API   every other route (accounts, transfers, ...)
+#
+# Every ${VAR:-default} can be overridden via a root .env file.
+
+services:
+  # Single public entry point: /auth/* and /.well-known/* go to auth-api,
+  # everything else (including the combined /docs) to app-apis.
+  gateway:
+    image: nginx:1.27-alpine
+    ports:
+      - '${GATEWAY_PORT:-3000}:80'
+    volumes:
+      - ./infra/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      app-apis:
+        condition: service_healthy
+      auth-api:
+        condition: service_healthy
+    restart: unless-stopped
+
+  app-apis:
+    build:
+      context: .
+      dockerfile: apps/app-apis/Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      DATABASE_URL: postgres://bank:${POSTGRES_PASSWORD:-bank}@postgres:5432/bank
+      REDIS_URL: redis://redis:6379
+      AUTH_JWKS_URL: http://auth-api:3001/.well-known/jwks.json
+      AUTH_ISSUER: ${JWT_ISSUER:-bank-auth}
+      AUTH_AUDIENCE: ${JWT_AUDIENCE:-bank-internal-api}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-}
+      # Merge the auth API's spec into /docs so the gateway serves one
+      # combined Swagger UI for the whole platform.
+      DOCS_MERGE_SPEC_URLS: http://auth-api:3001/docs/openapi.json
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+      auth-api:
+        condition: service_healthy
+    restart: unless-stopped
+
+  auth-api:
+    build:
+      context: .
+      dockerfile: apps/auth-api/Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      DATABASE_URL: postgres://bank:${POSTGRES_PASSWORD:-bank}@postgres:5432/bank
+      JWT_PRIVATE_KEY_FILE: /keys/jwt.pem
+      JWT_ISSUER: ${JWT_ISSUER:-bank-auth}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:-bank-internal-api}
+      JWT_TTL_SECONDS: ${JWT_TTL_SECONDS:-3600}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-}
+    volumes:
+      # DEV-ONLY committed key so the stack works out of the box.
+      # Point this at your own key (or use JWT_PRIVATE_KEY) in production.
+      - ./apps/auth-api/dev/jwt-dev-es256.pem:/keys/jwt.pem:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  executor:
+    build:
+      context: .
+      dockerfile: apps/executor/Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 3002
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      DATABASE_URL: postgres://bank:${POSTGRES_PASSWORD:-bank}@postgres:5432/bank
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  # One-shot job: applies migrations, seeds the four assignment customers
+  # and the admin user. Idempotent — safe on every `docker compose up`.
+  migrate:
+    build:
+      context: .
+      dockerfile: packages/db/Dockerfile
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgres://bank:${POSTGRES_PASSWORD:-bank}@postgres:5432/bank
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@bank.local}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin12345}
+      ADMIN_NAME: ${ADMIN_NAME:-Admin}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: 'no'
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: bank
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-bank}
+      POSTGRES_DB: bank
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U bank -d bank']
+      interval: 2s
+      timeout: 3s
+      retries: 15
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 2s
+      timeout: 3s
+      retries: 15
+
+volumes:
+  pgdata:
+  redisdata:

@@ -1,0 +1,64 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalEnv": ["NODE_ENV"],
+  "globalDependencies": ["pnpm-workspace.yaml"],
+  "tasks": {
+    "topo": {
+      "dependsOn": ["^topo"]
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true,
+      "passThroughEnv": [
+        "PORT",
+        "LOG_LEVEL",
+        "DATABASE_URL",
+        "REDIS_URL",
+        "AUTH_JWKS_URL",
+        "AUTH_ISSUER",
+        "AUTH_AUDIENCE",
+        "CORS_ALLOWED_ORIGINS",
+        "JWT_*",
+        "ADMIN_*"
+      ]
+    },
+    "lint": {
+      "dependsOn": ["topo"],
+      "outputs": [".cache/.eslintcache"]
+    },
+    "format": {
+      "outputs": [".cache/.prettiercache"],
+      "outputLogs": "new-only"
+    },
+    "typecheck": {
+      "dependsOn": ["topo"]
+    },
+    "test": {
+      "dependsOn": ["topo"],
+      "cache": false,
+      "env": ["DATABASE_URL", "TEST_DATABASE_URL", "TEST_REDIS_URL", "CI"],
+      "passThroughEnv": ["DOCKER_HOST", "TESTCONTAINERS_*"]
+    },
+    "test:unit": {
+      "dependsOn": ["topo"]
+    },
+    "test:integration": {
+      "dependsOn": ["topo"],
+      "cache": false,
+      "env": ["TEST_DATABASE_URL", "TEST_REDIS_URL", "CI"],
+      "passThroughEnv": ["DOCKER_HOST", "TESTCONTAINERS_*"]
+    },
+    "db:generate": {
+      "cache": false,
+      "env": ["DATABASE_URL"]
+    },
+    "db:migrate": {
+      "cache": false,
+      "env": ["DATABASE_URL", "MIGRATIONS_DIR"]
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "@bank/prettier-config",
+  "version": "0.1.0",
+  "private": true,
+  "exports": {
+    ".": "./index.json"
+  },
+  "scripts": {
+    "format": "prettier --check . --ignore-path ../../.gitignore --ignore-path ../../.prettierignore"
+  }
+}

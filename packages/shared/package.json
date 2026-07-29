@@ -1,0 +1,37 @@
+{
+  "name": "@bank/shared",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "format": "prettier --check . --ignore-path ../../.gitignore --ignore-path ../../.prettierignore"
+  },
+  "dependencies": {
+    "@bank/db": "workspace:*",
+    "@bank/queue": "workspace:*",
+    "drizzle-orm": "catalog:",
+    "express": "catalog:",
+    "pino": "catalog:",
+    "pino-http": "catalog:",
+    "swagger-ui-express": "catalog:",
+    "zod": "catalog:",
+    "zod-openapi": "catalog:"
+  },
+  "devDependencies": {
+    "@bank/eslint-config": "workspace:*",
+    "@bank/tsconfig": "workspace:*",
+    "@types/express": "catalog:",
+    "@types/node": "catalog:",
+    "@types/swagger-ui-express": "catalog:",
+    "eslint": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

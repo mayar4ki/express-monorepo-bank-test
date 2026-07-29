@@ -1,0 +1,6 @@
+**/dist/
+**/node_modules/
+**/coverage/
+**/.cache/
+packages/db/migrations/
+pnpm-lock.yaml

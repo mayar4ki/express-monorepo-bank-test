@@ -1,0 +1,4 @@
+{
+  "extends": "@bank/tsconfig/base.json",
+  "include": ["src", "scripts", "drizzle.config.ts", "tsup.config.ts"]
+}

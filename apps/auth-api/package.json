@@ -1,0 +1,50 @@
+{
+  "name": "@bank/auth-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/main.ts",
+    "build": "tsup",
+    "start": "node dist/main.js",
+    "test": "vitest run",
+    "test:integration": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "generate-dev-key": "tsx scripts/generate-dev-key.ts",
+    "format": "prettier --check . --ignore-path ../../.gitignore --ignore-path ../../.prettierignore"
+  },
+  "dependencies": {
+    "@bank/db": "workspace:*",
+    "@bank/shared": "workspace:*",
+    "bcryptjs": "catalog:",
+    "cors": "catalog:",
+    "dotenv": "catalog:",
+    "drizzle-orm": "catalog:",
+    "express": "catalog:",
+    "jose": "catalog:",
+    "pg": "catalog:",
+    "pino": "catalog:",
+    "pino-http": "catalog:",
+    "swagger-ui-express": "catalog:",
+    "zod": "catalog:",
+    "zod-openapi": "catalog:"
+  },
+  "devDependencies": {
+    "@bank/eslint-config": "workspace:*",
+    "@bank/tsconfig": "workspace:*",
+    "@testcontainers/postgresql": "catalog:",
+    "@types/cors": "catalog:",
+    "@types/express": "catalog:",
+    "@types/node": "catalog:",
+    "@types/pg": "catalog:",
+    "@types/supertest": "catalog:",
+    "@types/swagger-ui-express": "catalog:",
+    "eslint": "catalog:",
+    "supertest": "catalog:",
+    "tsup": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

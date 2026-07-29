@@ -1,0 +1,28 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+*.tsbuildinfo
+
+# caches
+.cache/
+.turbo/
+.eslintcache
+
+# tests
+coverage/
+
+# environment / secrets
+.env
+.env.*
+!.env.example
+*.pem
+!apps/auth-api/dev/jwt-dev-es256.pem
+
+# logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
