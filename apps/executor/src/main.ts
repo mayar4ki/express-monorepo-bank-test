@@ -3,7 +3,7 @@ import { pino } from 'pino';
 
 import { createDb } from '@bank/db';
 import { createRedisConnection, createTransfersWorker } from '@bank/queue';
-import { createTransferProcessor } from '@bank/shared';
+import { createTransferProcessor } from '@bank/shared/transfers';
 
 import { loadEnv } from './env.js';
 import { startHealthServer } from './health.js';

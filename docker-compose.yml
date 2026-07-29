@@ -116,6 +116,8 @@ services:
 
   postgres:
     image: postgres:17-alpine
+    ports:
+      - '${POSTGRES_PORT:-5432}:5432'
     environment:
       POSTGRES_USER: bank
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-bank}

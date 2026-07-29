@@ -113,6 +113,9 @@ importers:
       '@bank/prettier-config':
         specifier: workspace:*
         version: link:tooling/prettier
+      eslint:
+        specifier: 'catalog:'
+        version: 10.8.0
       husky:
         specifier: ^9.1.7
         version: 9.1.7

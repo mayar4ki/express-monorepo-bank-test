@@ -24,6 +24,7 @@
     "postinstall": "pnpm lint:ws",
     "db:generate": "pnpm --filter @bank/db db:generate",
     "db:migrate": "pnpm --filter @bank/db db:migrate",
+    "db:studio": "pnpm --filter @bank/db db:studio",
     "prepare": "husky"
   },
   "prettier": "@bank/prettier-config",
@@ -38,6 +39,7 @@
   },
   "devDependencies": {
     "@bank/prettier-config": "workspace:*",
+    "eslint": "catalog:",
     "husky": "^9.1.7",
     "lint-staged": "^17.2.0",
     "prettier": "catalog:",

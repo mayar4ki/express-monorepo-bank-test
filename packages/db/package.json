@@ -11,6 +11,7 @@
     "build": "tsup",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx scripts/migrate.ts",
+    "db:studio": "drizzle-kit studio",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "format": "prettier --check . --ignore-path ../../.gitignore --ignore-path ../../.prettierignore"
