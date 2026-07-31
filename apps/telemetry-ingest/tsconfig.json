@@ -1,0 +1,4 @@
+{
+  "extends": "@bank/tsconfig/base.json",
+  "include": ["src", "tests", "tsup.config.ts", "vitest.config.ts"]
+}

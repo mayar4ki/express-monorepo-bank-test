@@ -7,6 +7,10 @@
 #   - Login:        POST :3000/auth/login  { "email": "admin@bank.local", "password": "admin12345" }
 #   - Banking API   every other route (accounts, transfers, ...)
 #
+# Vehicle telemetry has its own entry point, because Teltonika devices speak a
+# binary protocol over raw TCP rather than HTTP and so cannot go through nginx:
+#   - Devices       tcp://localhost:5027   (Codec 8 / 8E)
+#
 # Every ${VAR:-default} can be overridden via a root .env file.
 
 services:
@@ -97,6 +101,59 @@ services:
         condition: service_completed_successfully
     restart: unless-stopped
 
+  # Where the vehicles' Teltonika devices connect. Its port is published
+  # directly: the protocol is binary TCP, so the nginx HTTP gateway cannot
+  # route it and would only add a hop.
+  telemetry-ingest:
+    build:
+      context: .
+      dockerfile: apps/telemetry-ingest/Dockerfile
+    ports:
+      - '${TELEMETRY_TCP_PORT:-5027}:5027'
+    environment:
+      NODE_ENV: production
+      PORT: 3003
+      TCP_PORT: 5027
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      KAFKA_BROKERS: kafka:9092
+      IDLE_TIMEOUT_MS: ${IDLE_TIMEOUT_MS:-300000}
+      BACKFILL_THRESHOLD_MS: ${BACKFILL_THRESHOLD_MS:-300000}
+    depends_on:
+      kafka:
+        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  # Four consumer groups in one process. Narrow CONSUMERS to split any of them
+  # into its own deployment; their offsets are already independent.
+  telemetry-consumers:
+    build:
+      context: .
+      dockerfile: apps/telemetry-consumers/Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 3004
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      DATABASE_URL: postgres://bank:${POSTGRES_PASSWORD:-bank}@postgres:5432/bank
+      KAFKA_BROKERS: kafka:9092
+      CONSUMERS: ${CONSUMERS:-all}
+      LOW_FUEL_PCT: ${LOW_FUEL_PCT:-15}
+      SPEED_LIMIT_KPH: ${SPEED_LIMIT_KPH:-90}
+      ALERT_COOLDOWN_MS: ${ALERT_COOLDOWN_MS:-900000}
+      ALERT_MAX_AGE_MS: ${ALERT_MAX_AGE_MS:-600000}
+      GEOFENCE_REFRESH_MS: ${GEOFENCE_REFRESH_MS:-60000}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+      kafka:
+        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
   # One-shot job: applies migrations, seeds the four assignment customers
   # and the admin user. Idempotent — safe on every `docker compose up`.
   migrate:
@@ -140,6 +197,78 @@ services:
       timeout: 3s
       retries: 15
 
+  # Single-node KRaft broker — no Zookeeper. It is also the buffer that makes a
+  # consumer outage survivable: retention (below) is the window in which a
+  # consumer that was down can still catch up on everything it missed.
+  kafka:
+    image: apache/kafka:3.9.1
+    ports:
+      # Second listener for the host, so `pnpm dev` and the integration tests
+      # (TEST_KAFKA_BROKERS) can use this broker. Clients reconnect to whatever
+      # address the broker advertises, which is why in-network and host traffic
+      # need separate listeners rather than one published port.
+      - '${KAFKA_HOST_PORT:-29092}:29092'
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,HOST://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,HOST://localhost:${KAFKA_HOST_PORT:-29092}
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      # The image defaults to /tmp/kraft-combined-logs. Without this the volume
+      # below is inert, and every recreation would silently discard retained
+      # messages and committed offsets — the two things a consumer coming back
+      # from an outage relies on.
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      # Required for the idempotent producer on a single-node broker.
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      # A dead consumer group's committed offsets must outlive the topic
+      # retention, or a long outage would lose its place as well as its backlog.
+      KAFKA_OFFSETS_RETENTION_MINUTES: ${KAFKA_OFFSETS_RETENTION_MINUTES:-20160}
+      # Topics are created deliberately by kafka-init, with chosen partition
+      # counts — a typo in a topic name should fail loudly, not silently create.
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'false'
+    volumes:
+      - kafkadata:/var/lib/kafka/data
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          '/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092',
+        ]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+      start_period: 20s
+
+  # One-shot job, mirroring `migrate`. Idempotent via --if-not-exists.
+  kafka-init:
+    image: apache/kafka:3.9.1
+    entrypoint: ['/bin/sh', '-c']
+    command:
+      - |
+        set -e
+        create() {
+          /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists \
+            --topic "$$1" --partitions "$$2" --replication-factor 1 \
+            --config retention.ms=${TELEMETRY_RETENTION_MS:-604800000}
+        }
+        # Six partitions gives room to scale consumers out; messages are keyed
+        # by IMEI, so a vehicle's records stay on one partition and in order.
+        create vehicle.telemetry.live 6
+        create vehicle.telemetry.backfill 6
+        create vehicle.telemetry.dlq 1
+        echo "topics ready"
+    depends_on:
+      kafka:
+        condition: service_healthy
+    restart: 'no'
+
 volumes:
   pgdata:
   redisdata:
+  kafkadata:

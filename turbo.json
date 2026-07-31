@@ -23,7 +23,17 @@
         "AUTH_AUDIENCE",
         "CORS_ALLOWED_ORIGINS",
         "JWT_*",
-        "ADMIN_*"
+        "ADMIN_*",
+        "KAFKA_*",
+        "TCP_PORT",
+        "TELEMETRY_*",
+        "IDLE_TIMEOUT_MS",
+        "BACKFILL_THRESHOLD_MS",
+        "CONSUMERS",
+        "LOW_FUEL_PCT",
+        "SPEED_LIMIT_KPH",
+        "ALERT_*",
+        "GEOFENCE_REFRESH_MS"
       ]
     },
     "lint": {
@@ -40,7 +50,7 @@
     "test": {
       "dependsOn": ["topo"],
       "cache": false,
-      "env": ["DATABASE_URL", "TEST_DATABASE_URL", "TEST_REDIS_URL", "CI"],
+      "env": ["DATABASE_URL", "TEST_DATABASE_URL", "TEST_REDIS_URL", "TEST_KAFKA_BROKERS", "CI"],
       "passThroughEnv": ["DOCKER_HOST", "TESTCONTAINERS_*"]
     },
     "test:unit": {
@@ -49,7 +59,7 @@
     "test:integration": {
       "dependsOn": ["topo"],
       "cache": false,
-      "env": ["TEST_DATABASE_URL", "TEST_REDIS_URL", "CI"],
+      "env": ["TEST_DATABASE_URL", "TEST_REDIS_URL", "TEST_KAFKA_BROKERS", "CI"],
       "passThroughEnv": ["DOCKER_HOST", "TESTCONTAINERS_*"]
     },
     "db:generate": {

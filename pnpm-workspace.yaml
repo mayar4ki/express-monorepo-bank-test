@@ -19,6 +19,7 @@ catalog:
   swagger-ui-express: ^5.0.1
   bullmq: ^5.81.2
   ioredis: ^5.11.1
+  kafkajs: ^2.2.4
   jose: ^6.2.4
   bcryptjs: ^3.0.3
   # tooling
@@ -35,6 +36,9 @@ catalog:
   prettier: ^3.9.6
   '@testcontainers/postgresql': ^12.0.4
   '@testcontainers/redis': ^12.0.4
+  # Kafka has no dedicated module for the apache/kafka image (@testcontainers/kafka
+  # only drives Confluent Platform images), so its container is built generically.
+  testcontainers: ^12.0.4
   '@types/node': ^26.1.2
   '@types/express': ^5.0.6
   '@types/cors': ^2.8.19
