@@ -1,5 +1,5 @@
-import { vehicles } from '@bank/db';
-import type { Db } from '@bank/db';
+import { vehicles } from '@bank/db-telemetry';
+import type { TelemetryDb } from '@bank/db-telemetry';
 import { eq } from 'drizzle-orm';
 
 /**
@@ -12,7 +12,7 @@ import { eq } from 'drizzle-orm';
  * The cache matters: every reading needs this lookup, and a vehicle's id never
  * changes once assigned.
  */
-export function createVehicleRegistry(db: Db) {
+export function createVehicleRegistry(db: TelemetryDb) {
   const cache = new Map<string, string>();
 
   return {

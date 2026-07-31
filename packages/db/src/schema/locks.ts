@@ -2,7 +2,7 @@ import { sql } from 'drizzle-orm';
 import { index, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 import { accounts } from './accounts.js';
-import { createdAt, id, seq } from './common.js';
+import { createdAt, id, seq } from '@bank/db-kit';
 
 export const accountLocks = pgTable(
   'account_locks',

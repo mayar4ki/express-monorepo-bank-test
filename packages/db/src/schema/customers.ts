@@ -1,6 +1,6 @@
 import { pgTable, text } from 'drizzle-orm/pg-core';
 
-import { createdAt, id, seq } from './common.js';
+import { createdAt, id, seq } from '@bank/db-kit';
 
 export const customers = pgTable('customers', {
   id: id(),

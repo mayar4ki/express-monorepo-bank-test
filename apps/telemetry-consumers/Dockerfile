@@ -9,7 +9,8 @@ WORKDIR /repo
 # Manifests first so dependency resolution is cached across code changes.
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY apps/telemetry-consumers/package.json apps/telemetry-consumers/
-COPY packages/db/package.json packages/db/
+COPY packages/db-telemetry/package.json packages/db-telemetry/
+COPY packages/db-kit/package.json packages/db-kit/
 COPY packages/events/package.json packages/events/
 COPY packages/teltonika/package.json packages/teltonika/
 COPY tooling/ tooling/

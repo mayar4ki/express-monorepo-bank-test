@@ -1,7 +1,7 @@
 import { sql } from 'drizzle-orm';
 import { bigint, check, index, pgTable, uuid } from 'drizzle-orm/pg-core';
 
-import { createdAt, id, seq } from './common.js';
+import { createdAt, id, seq } from '@bank/db-kit';
 import { customers } from './customers.js';
 
 export const accounts = pgTable(

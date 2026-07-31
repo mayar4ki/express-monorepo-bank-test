@@ -1,4 +1,9 @@
-import { vehicleEngineEvents, vehicleFuelReadings, vehicleLocations, vehicles } from '@bank/db';
+import {
+  vehicleEngineEvents,
+  vehicleFuelReadings,
+  vehicleLocations,
+  vehicles,
+} from '@bank/db-telemetry';
 import { AVL_ID } from '@bank/teltonika';
 import { asc, eq } from 'drizzle-orm';
 import { afterEach, beforeEach, describe, expect, inject, it } from 'vitest';

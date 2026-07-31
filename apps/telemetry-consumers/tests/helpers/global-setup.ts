@@ -1,4 +1,4 @@
-import { startPostgresForTests } from '@bank/db/testing';
+import { startTelemetryPostgresForTests } from '@bank/db-telemetry/testing';
 import { startKafkaForTests } from '@bank/events/testing';
 import type { TestProject } from 'vitest/node';
 
@@ -15,7 +15,10 @@ declare module 'vitest' {
  * docker-compose ones, say) instead.
  */
 export default async function setup(project: TestProject) {
-  const [postgres, kafka] = await Promise.all([startPostgresForTests(), startKafkaForTests()]);
+  const [postgres, kafka] = await Promise.all([
+    startTelemetryPostgresForTests(),
+    startKafkaForTests(),
+  ]);
   project.provide('databaseUrl', postgres.databaseUrl);
   project.provide('kafkaBrokers', kafka.brokers);
 

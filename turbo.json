@@ -50,7 +50,14 @@
     "test": {
       "dependsOn": ["topo"],
       "cache": false,
-      "env": ["DATABASE_URL", "TEST_DATABASE_URL", "TEST_REDIS_URL", "TEST_KAFKA_BROKERS", "CI"],
+      "env": [
+        "DATABASE_URL",
+        "TEST_DATABASE_URL",
+        "TEST_REDIS_URL",
+        "TEST_KAFKA_BROKERS",
+        "TEST_TELEMETRY_DATABASE_URL",
+        "CI"
+      ],
       "passThroughEnv": ["DOCKER_HOST", "TESTCONTAINERS_*"]
     },
     "test:unit": {
@@ -59,16 +66,27 @@
     "test:integration": {
       "dependsOn": ["topo"],
       "cache": false,
-      "env": ["TEST_DATABASE_URL", "TEST_REDIS_URL", "TEST_KAFKA_BROKERS", "CI"],
+      "env": [
+        "TEST_DATABASE_URL",
+        "TEST_REDIS_URL",
+        "TEST_KAFKA_BROKERS",
+        "TEST_TELEMETRY_DATABASE_URL",
+        "CI"
+      ],
       "passThroughEnv": ["DOCKER_HOST", "TESTCONTAINERS_*"]
     },
     "db:generate": {
       "cache": false,
-      "env": ["DATABASE_URL"]
+      "env": ["DATABASE_URL", "TELEMETRY_DATABASE_URL"]
     },
     "db:migrate": {
       "cache": false,
-      "env": ["DATABASE_URL", "MIGRATIONS_DIR"]
+      "env": [
+        "DATABASE_URL",
+        "MIGRATIONS_DIR",
+        "TELEMETRY_DATABASE_URL",
+        "TELEMETRY_MIGRATIONS_DIR"
+      ]
     }
   }
 }

@@ -1,7 +1,7 @@
 import { sql } from 'drizzle-orm';
 import { pgTable, text, uniqueIndex } from 'drizzle-orm/pg-core';
 
-import { createdAt, id } from './common.js';
+import { createdAt, id } from '@bank/db-kit';
 
 export const users = pgTable(
   'users',

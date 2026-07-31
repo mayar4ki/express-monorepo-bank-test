@@ -1,5 +1,5 @@
-import { vehicleLocations } from '@bank/db';
-import type { Db } from '@bank/db';
+import { vehicleLocations } from '@bank/db-telemetry';
+import type { TelemetryDb } from '@bank/db-telemetry';
 import type { TelemetryBatchHandler } from '@bank/events';
 import type { Logger } from 'pino';
 
@@ -14,7 +14,7 @@ import type { VehicleRegistry } from '../vehicles.js';
  * whenever it arrives.
  */
 export function createLocationsHandler(deps: {
-  db: Db;
+  db: TelemetryDb;
   logger: Logger;
   vehicles: VehicleRegistry;
 }): TelemetryBatchHandler {

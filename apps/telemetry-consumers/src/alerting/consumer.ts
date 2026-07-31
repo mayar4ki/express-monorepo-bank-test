@@ -1,5 +1,5 @@
-import { geofences, vehicleAlertStates, vehicleAlerts } from '@bank/db';
-import type { Db } from '@bank/db';
+import { geofences, vehicleAlertStates, vehicleAlerts } from '@bank/db-telemetry';
+import type { TelemetryDb } from '@bank/db-telemetry';
 import type { TelemetryBatchHandler, TelemetryEvent } from '@bank/events';
 import { and, eq } from 'drizzle-orm';
 import type { Logger } from 'pino';
@@ -35,7 +35,7 @@ export interface AlertingConfig {
  * ago.
  */
 export function createAlertingHandler(deps: {
-  db: Db;
+  db: TelemetryDb;
   logger: Logger;
   vehicles: VehicleRegistry;
   config: AlertingConfig;
@@ -160,7 +160,7 @@ export function createAlertingHandler(deps: {
 }
 
 async function raise(
-  deps: { db: Db; logger: Logger },
+  deps: { db: TelemetryDb; logger: Logger },
   vehicleId: string,
   event: TelemetryEvent,
   candidate: AlertCandidate | undefined,

@@ -1,6 +1,7 @@
-import { fileURLToPath } from 'node:url';
-
-import { migrate } from 'drizzle-orm/node-postgres/migrator';
+import {
+  resolveMigrationsFolder as resolveKitMigrationsFolder,
+  runMigrations as runKitMigrations,
+} from '@bank/db-kit';
 
 import type { Db } from './client.js';
 
@@ -10,9 +11,9 @@ import type { Db } from './client.js';
  * the location (the images place the folder next to the bundle).
  */
 export function resolveMigrationsFolder(): string {
-  return process.env.MIGRATIONS_DIR ?? fileURLToPath(new URL('../migrations', import.meta.url));
+  return resolveKitMigrationsFolder(new URL('../migrations', import.meta.url), 'MIGRATIONS_DIR');
 }
 
 export async function runMigrations(db: Db): Promise<void> {
-  await migrate(db, { migrationsFolder: resolveMigrationsFolder() });
+  await runKitMigrations(db, resolveMigrationsFolder());
 }

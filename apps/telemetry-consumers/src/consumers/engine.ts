@@ -1,5 +1,5 @@
-import { vehicleEngineEvents } from '@bank/db';
-import type { Db } from '@bank/db';
+import { vehicleEngineEvents } from '@bank/db-telemetry';
+import type { TelemetryDb } from '@bank/db-telemetry';
 import type { TelemetryBatchHandler, TelemetryEvent } from '@bank/events';
 import { AVL_ID } from '@bank/teltonika';
 import { and, desc, eq, inArray } from 'drizzle-orm';
@@ -37,7 +37,7 @@ const MOVEMENT_EVENTS = ['movement_start', 'movement_stop'] as const;
  * that happens across a restart is still noticed.
  */
 export function createEngineHandler(deps: {
-  db: Db;
+  db: TelemetryDb;
   logger: Logger;
   vehicles: VehicleRegistry;
 }): TelemetryBatchHandler {
@@ -93,7 +93,7 @@ export function createEngineHandler(deps: {
 
 /** The newest stored transition of one kind, or undefined if there is none. */
 async function lastTransition(
-  db: Db,
+  db: TelemetryDb,
   vehicleId: string,
   types: readonly EngineEventType[],
 ): Promise<EngineEventType | undefined> {

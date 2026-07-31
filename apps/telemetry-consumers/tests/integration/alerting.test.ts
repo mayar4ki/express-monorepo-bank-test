@@ -1,4 +1,4 @@
-import { geofences, vehicleAlertStates, vehicleAlerts } from '@bank/db';
+import { geofences, vehicleAlertStates, vehicleAlerts } from '@bank/db-telemetry';
 import { AVL_ID } from '@bank/teltonika';
 import { asc } from 'drizzle-orm';
 import { afterEach, describe, expect, inject, it } from 'vitest';

@@ -1,5 +1,11 @@
 import { bigint, timestamp, uuid } from 'drizzle-orm/pg-core';
 
+/**
+ * Column conventions shared by every database in the platform. They live here
+ * rather than in one schema package so the banking and telemetry clusters
+ * cannot drift apart on something as basic as what an id or a timestamp is.
+ */
+
 export const id = () => uuid().defaultRandom().primaryKey();
 
 /**

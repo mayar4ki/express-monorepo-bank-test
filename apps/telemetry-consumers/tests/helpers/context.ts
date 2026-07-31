@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 
-import { createDb } from '@bank/db';
-import type { Db } from '@bank/db';
+import { createTelemetryDb } from '@bank/db-telemetry';
+import type { TelemetryDb } from '@bank/db-telemetry';
 import {
   buildTelemetryEvents,
   createKafka,
@@ -50,7 +50,7 @@ export async function createConsumerContext(options: {
   };
   await createTestTopics(options.brokers, [topics.live, topics.backfill, topics.dlq]);
 
-  const { db, pool } = createDb(options.databaseUrl);
+  const { db, pool } = createTelemetryDb(options.databaseUrl);
   const kafka = createKafka({ brokers: options.brokers, clientId: `test-consumers-${suffix}` });
   const producer: Producer = createTelemetryProducer(kafka);
   await producer.connect();
@@ -134,7 +134,7 @@ export async function createConsumerContext(options: {
 export type ConsumerContext = Awaited<ReturnType<typeof createConsumerContext>>;
 
 /** Telemetry tables only; the banking seed data is left alone. */
-export async function resetTelemetry(db: Db): Promise<void> {
+export async function resetTelemetry(db: TelemetryDb): Promise<void> {
   await db.execute(sql`
     truncate table
       vehicle_locations,

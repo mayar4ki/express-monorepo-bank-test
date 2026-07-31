@@ -1,6 +1,6 @@
 import http from 'node:http';
 
-import type { Db } from '@bank/db';
+import type { TelemetryDb } from '@bank/db-telemetry';
 import { sql } from 'drizzle-orm';
 
 /**
@@ -11,7 +11,7 @@ import { sql } from 'drizzle-orm';
  */
 export function startHealthServer(opts: {
   port: number;
-  db: Db;
+  db: TelemetryDb;
   isRunning: () => boolean;
   consumersRunning: () => Record<string, boolean>;
 }): http.Server {

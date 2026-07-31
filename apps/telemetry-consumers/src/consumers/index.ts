@@ -1,4 +1,4 @@
-import type { Db } from '@bank/db';
+import type { TelemetryDb } from '@bank/db-telemetry';
 import {
   consumerGroups,
   createTelemetryConsumer,
@@ -18,7 +18,7 @@ import { createLocationsHandler } from './locations.js';
 
 export interface BuildConsumersOptions {
   kafka: Kafka;
-  db: Db;
+  db: TelemetryDb;
   logger: Logger;
   /** Where undecodable messages go. */
   dlqProducer: Producer;

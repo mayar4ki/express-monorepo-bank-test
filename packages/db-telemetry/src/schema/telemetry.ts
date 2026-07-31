@@ -17,7 +17,7 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core';
 
-import { createdAt, id, seq } from './common.js';
+import { createdAt, id, seq } from '@bank/db-kit';
 
 /**
  * Telemetry from the Teltonika devices fitted to cash-in-transit vehicles.

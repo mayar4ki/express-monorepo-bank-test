@@ -12,7 +12,7 @@ import {
 } from 'drizzle-orm/pg-core';
 
 import { accounts } from './accounts.js';
-import { createdAt, id, seq } from './common.js';
+import { createdAt, id, seq } from '@bank/db-kit';
 
 export const transferStatus = pgEnum('transfer_status', ['pending', 'completed', 'failed']);
 

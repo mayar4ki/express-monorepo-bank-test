@@ -15,7 +15,7 @@
     "format": "prettier --check . --ignore-path ../../.gitignore --ignore-path ../../.prettierignore"
   },
   "dependencies": {
-    "@bank/db": "workspace:*",
+    "@bank/db-telemetry": "workspace:*",
     "@bank/events": "workspace:*",
     "@bank/teltonika": "workspace:*",
     "dotenv": "catalog:",

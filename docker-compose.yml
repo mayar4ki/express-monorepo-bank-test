@@ -135,7 +135,7 @@ services:
       NODE_ENV: production
       PORT: 3004
       LOG_LEVEL: ${LOG_LEVEL:-info}
-      DATABASE_URL: postgres://bank:${POSTGRES_PASSWORD:-bank}@postgres:5432/bank
+      TELEMETRY_DATABASE_URL: postgres://bank:${POSTGRES_PASSWORD:-bank}@postgres-telemetry:5432/bank_telemetry
       KAFKA_BROKERS: kafka:9092
       CONSUMERS: ${CONSUMERS:-all}
       LOW_FUEL_PCT: ${LOW_FUEL_PCT:-15}
@@ -144,15 +144,29 @@ services:
       ALERT_MAX_AGE_MS: ${ALERT_MAX_AGE_MS:-600000}
       GEOFENCE_REFRESH_MS: ${GEOFENCE_REFRESH_MS:-60000}
     depends_on:
-      postgres:
+      postgres-telemetry:
         condition: service_healthy
-      migrate:
+      migrate-telemetry:
         condition: service_completed_successfully
       kafka:
         condition: service_healthy
       kafka-init:
         condition: service_completed_successfully
     restart: unless-stopped
+
+  # One-shot job for the telemetry cluster. No seed: vehicles register
+  # themselves the first time their device reports.
+  migrate-telemetry:
+    build:
+      context: .
+      dockerfile: packages/db-telemetry/Dockerfile
+    environment:
+      NODE_ENV: production
+      TELEMETRY_DATABASE_URL: postgres://bank:${POSTGRES_PASSWORD:-bank}@postgres-telemetry:5432/bank_telemetry
+    depends_on:
+      postgres-telemetry:
+        condition: service_healthy
+    restart: 'no'
 
   # One-shot job: applies migrations, seeds the four assignment customers
   # and the admin user. Idempotent — safe on every `docker compose up`.
@@ -183,6 +197,26 @@ services:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U bank -d bank']
+      interval: 2s
+      timeout: 3s
+      retries: 15
+
+  # Telemetry lives on its own Postgres instance, not just its own database.
+  # Physical replication and backups are per-cluster, so this is what keeps
+  # vehicle history out of the banking cluster's backups and replicas — and
+  # stops a telemetry write storm touching the disk that holds transfers.
+  postgres-telemetry:
+    image: postgres:17-alpine
+    ports:
+      - '${POSTGRES_TELEMETRY_PORT:-5433}:5432'
+    environment:
+      POSTGRES_USER: bank
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-bank}
+      POSTGRES_DB: bank_telemetry
+    volumes:
+      - pgdata_telemetry:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U bank -d bank_telemetry']
       interval: 2s
       timeout: 3s
       retries: 15
@@ -270,5 +304,6 @@ services:
 
 volumes:
   pgdata:
+  pgdata_telemetry:
   redisdata:
   kafkadata:

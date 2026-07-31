@@ -1,5 +1,5 @@
-import { vehicleFuelReadings } from '@bank/db';
-import type { Db } from '@bank/db';
+import { vehicleFuelReadings } from '@bank/db-telemetry';
+import type { TelemetryDb } from '@bank/db-telemetry';
 import type { TelemetryBatchHandler } from '@bank/events';
 import type { Logger } from 'pino';
 
@@ -11,7 +11,7 @@ import type { VehicleRegistry } from '../vehicles.js';
  * that visible instead of silently picking a winner.
  */
 export function createFuelHandler(deps: {
-  db: Db;
+  db: TelemetryDb;
   logger: Logger;
   vehicles: VehicleRegistry;
 }): TelemetryBatchHandler {

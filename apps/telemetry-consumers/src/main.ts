@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { pino } from 'pino';
 
-import { createDb } from '@bank/db';
+import { createTelemetryDb } from '@bank/db-telemetry';
 import { createKafka, createTelemetryProducer } from '@bank/events';
 
 import { buildConsumers } from './consumers/index.js';
@@ -12,7 +12,7 @@ const SHUTDOWN_TIMEOUT_MS = 30_000;
 
 const env = loadEnv();
 const logger = pino({ level: env.LOG_LEVEL });
-const { db, pool } = createDb(env.DATABASE_URL);
+const { db, pool } = createTelemetryDb(env.TELEMETRY_DATABASE_URL);
 
 const kafka = createKafka({
   brokers: parseBrokers(env.KAFKA_BROKERS),
