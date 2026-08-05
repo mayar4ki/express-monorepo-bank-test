@@ -1,0 +1,4 @@
+{
+  "extends": "@bank/tsconfig/base.json",
+  "include": ["src", "tsup.config.ts"]
+}

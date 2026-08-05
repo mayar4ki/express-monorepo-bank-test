@@ -1,0 +1,28 @@
+{
+  "name": "@acme/ping-report",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsup",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --check . --ignore-path ../../.gitignore --ignore-path ../../.prettierignore"
+  },
+  "dependencies": {
+    "@acme/pings": "workspace:*",
+    "@acme/types": "workspace:*",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@bank/eslint-config": "workspace:*",
+    "@bank/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "eslint": "catalog:",
+    "tsup": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:"
+  }
+}

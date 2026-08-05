@@ -25,6 +25,9 @@
     "db:generate": "pnpm --filter @bank/db db:generate",
     "db:migrate": "pnpm --filter @bank/db db:migrate",
     "db:studio": "pnpm --filter @bank/db db:studio",
+    "ping:all": "turbo run build --filter=@acme/ping-ingest --filter=@acme/ping-report && pnpm -s ping:ingest && pnpm -s ping:report",
+    "ping:ingest": "node apps/ping-ingest/dist/index.js apps/ping-ingest/fixtures/pings.json",
+    "ping:report": "node apps/ping-report/dist/index.js apps/ping-ingest/fixtures/pings.json",
     "prepare": "husky"
   },
   "prettier": "@bank/prettier-config",

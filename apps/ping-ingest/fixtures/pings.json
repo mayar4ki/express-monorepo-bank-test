@@ -1,0 +1,5 @@
+[
+  { "deviceId": "d1", "speedKph": 42.5, "ts": "2026-07-01T10:00:00Z" },
+  { "deviceId": "d1", "speedKph": 61.2, "ts": "2026-07-01T10:05:00Z" },
+  { "deviceId": "d2", "speedKph": 0, "ts": "2026-07-01T10:05:00Z" }
+]

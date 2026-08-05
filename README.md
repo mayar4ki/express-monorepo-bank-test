@@ -23,20 +23,24 @@ A Turborepo/pnpm monorepo implementing an internal banking platform for bank emp
                                                  └─────────────┘
 ```
 
-| Workspace                  | What it is                                                                                                     |
-| -------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `apps/app-apis`            | Banking API: customers, accounts, transfers, comments, locks — JWT-protected ([API.md](apps/app-apis/API.md))  |
-| `apps/auth-api`            | Auth service: register / login / me, ES256 JWTs, JWKS ([API.md](apps/auth-api/API.md))                         |
-| `apps/executor`            | BullMQ worker executing transfers one at a time; scale it independently                                        |
-| `apps/telemetry-ingest`    | TCP listener for the cash vehicles' Teltonika devices → Kafka ([TELEMETRY.md](docs/TELEMETRY.md))              |
-| `apps/telemetry-consumers` | Four consumer groups writing telemetry to Postgres and raising vehicle alerts                                  |
-| `packages/db`              | Drizzle schema, SQL migrations, seeds (`@bank/db`)                                                             |
-| `packages/queue`           | Single source of truth for the BullMQ queue: name, payload types, options, worker factory (`@bank/queue`)      |
-| `packages/events`          | Single source of truth for Kafka telemetry: topics, event schema, producer/consumer factories (`@bank/events`) |
-| `packages/teltonika`       | Teltonika Codec 8 / 8E codec: framing, CRC, AVL parsing, IO map — pure functions (`@bank/teltonika`)           |
-| `packages/shared`          | Errors, route/validation/OpenAPI machinery, transfer executor domain logic (`@bank/shared`)                    |
-| `infra/nginx`              | Gateway config: maps every service onto one port with a combined Swagger UI                                    |
-| `tooling/*`                | Shared tsconfig / ESLint / Prettier configs                                                                    |
+| Workspace                  | What it is                                                                                                              |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `apps/app-apis`            | Banking API: customers, accounts, transfers, comments, locks — JWT-protected ([API.md](apps/app-apis/API.md))           |
+| `apps/auth-api`            | Auth service: register / login / me, ES256 JWTs, JWKS ([API.md](apps/auth-api/API.md))                                  |
+| `apps/executor`            | BullMQ worker executing transfers one at a time; scale it independently                                                 |
+| `apps/telemetry-ingest`    | TCP listener for the cash vehicles' Teltonika devices → Kafka ([TELEMETRY.md](docs/TELEMETRY.md))                       |
+| `apps/telemetry-consumers` | Four consumer groups writing telemetry to Postgres and raising vehicle alerts                                           |
+| `apps/ping-ingest`         | Device-ping CLI exercise: validate a pings file, print `count` / `maxSpeed` ([PING-PIPELINE.md](docs/PING-PIPELINE.md)) |
+| `apps/ping-report`         | Same fixture, max speed per device (`@acme/ping-report`)                                                                |
+| `packages/db`              | Drizzle schema, SQL migrations, seeds (`@bank/db`)                                                                      |
+| `packages/queue`           | Single source of truth for the BullMQ queue: name, payload types, options, worker factory (`@bank/queue`)               |
+| `packages/events`          | Single source of truth for Kafka telemetry: topics, event schema, producer/consumer factories (`@bank/events`)          |
+| `packages/teltonika`       | Teltonika Codec 8 / 8E codec: framing, CRC, AVL parsing, IO map — pure functions (`@bank/teltonika`)                    |
+| `packages/shared`          | Errors, route/validation/OpenAPI machinery, transfer executor domain logic (`@bank/shared`)                             |
+| `packages/types`           | Device-ping zod schema and inferred types (`@acme/types`)                                                               |
+| `packages/pings`           | `summarizePings` → `{ count, maxSpeed }` over any set of pings (`@acme/pings`)                                          |
+| `infra/nginx`              | Gateway config: maps every service onto one port with a combined Swagger UI                                             |
+| `tooling/*`                | Shared tsconfig / ESLint / Prettier configs                                                                             |
 
 ### Vehicle telemetry
 
